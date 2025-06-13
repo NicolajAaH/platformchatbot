@@ -47,7 +47,7 @@ vectorstore.save_local("faq_index")
 vectorstore = FAISS.load_local("faq_index", embedding, allow_dangerous_deserialization=True)
 
 def chat_with_faq(question: str):
-    docs = vectorstore.similarity_search(question, k=2)
+    docs = vectorstore.similarity_search(question, k=3)
     context = "\n\n".join(doc.page_content for doc in docs)
     print("\nContext from FAQ snippets:\n", context)
     system_message = {

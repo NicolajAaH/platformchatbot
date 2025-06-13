@@ -1,5 +1,5 @@
 # Use official Python image as base
-FROM python:3.10-slim
+FROM python:3.13-slim
 
 # Set working directory
 WORKDIR /app
@@ -15,4 +15,4 @@ COPY . .
 EXPOSE 80
 
 # Run the app
-CMD ["python", "app.py"]
+CMD ["python3", "app.py"]

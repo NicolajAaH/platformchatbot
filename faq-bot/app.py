@@ -6,4 +6,4 @@ def chat_interface(message, history):
     response = chat_with_faq(message)
     return response
 
-gr.ChatInterface(fn=chat_interface, type="messages").launch(server_name="0.0.0.0")
+gr.ChatInterface(fn=chat_interface, type="messages").launch()
