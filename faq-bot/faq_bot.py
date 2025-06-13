@@ -7,9 +7,9 @@ from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
       
-endpoint = os.getenv("ENDPOINT_URL", "https://nhqtest.openai.azure.com/")
-deployment = os.getenv("DEPLOYMENT_NAME", "o4-mini")
-embeddingModel = os.getenv("EMBEDDING_DEPLOYMENT_NAME", "text-embedding-3-small")
+endpoint = os.getenv("ENDPOINT_URL")
+deployment = os.getenv("DEPLOYMENT_NAME")
+embeddingModel = os.getenv("EMBEDDING_DEPLOYMENT_NAME")
       
 # Initialize Azure OpenAI client with Entra ID authentication
 token_provider = get_bearer_token_provider(
