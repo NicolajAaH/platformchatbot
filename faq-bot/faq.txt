@@ -1,3 +1,18 @@
 If a databricks backup fails, then go to the log analytics workspace and under logs get the rows from the table DatabricksBackup_CL.
 
+----- NEW ------
 If a 403 Forbidden as status code is received, and the response body is “Blocked”, it means the WAF is blocking the request. 
+Logs are enabled and stored in the shared log analytics workspace, which means all logs are stored and are searchable.
+Using the following query in the log analytics workspace will show all blocked requests:
+AzureDiagnostics 
+| where ResourceProvider == "MICROSOFT.CDN" and Category == "FrontDoorWebApplicationFirewallLog" 
+| where action_s == "Block"
+More conditions such as IP can be added by adding a new line and adding
+| where clientIP_s == “{insert_ip_here}”
+ will show all blocked requests from a single IP.
+
+----- NEW ------
+Login failed for user '<token-identified principal>
+This is seen in various scenarios such as when attempts are made to rename function apps
+The background and solution is well-described in this article
+See “Solution” in the bottom of the article: confluence link to be added later

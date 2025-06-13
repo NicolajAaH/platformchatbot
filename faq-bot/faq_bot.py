@@ -1,10 +1,15 @@
 import os
-import base64
 from openai import AzureOpenAI
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from langchain_community.vectorstores import FAISS
+from langchain_openai.embeddings import AzureOpenAIEmbeddings
+from langchain.schema import Document
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
       
 endpoint = os.getenv("ENDPOINT_URL", "https://nhqtest.openai.azure.com/")
 deployment = os.getenv("DEPLOYMENT_NAME", "o4-mini")
+embeddingModel = os.getenv("EMBEDDING_DEPLOYMENT_NAME", "text-embedding-3-small")
       
 # Initialize Azure OpenAI client with Entra ID authentication
 token_provider = get_bearer_token_provider(
@@ -18,25 +23,42 @@ client = AzureOpenAI(
     api_version="2025-01-01-preview",
 )
 
+embedding = AzureOpenAIEmbeddings(
+    azure_endpoint=endpoint,
+    azure_ad_token_provider=token_provider,
+    deployment=embeddingModel,
+    openai_api_version="2024-12-01-preview",
+)
 
+# Load and split the FAQ
+with open("faq.txt", "r", encoding="utf-8") as f:
+    faq_text = f.read()
 
-def load_faq(filename="faq.txt"):
-    with open(filename, "r", encoding="utf-8") as f:
-        return f.read()
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+chunks = text_splitter.split_text(faq_text)
 
-def create_system_message(faq_text):
-    return {
-        "role": "system",
-        "content": f"You are a helpful AI assistant created by the platform engineering team to support developers. Use the following FAQ content to answer their questions clearly and concisely, helping them solve common issues before contacting the platform team directly.:\n{faq_text}"
-    }
+docs = [Document(page_content=chunk) for chunk in chunks]
+
+# Create and save the FAISS index
+vectorstore = FAISS.from_documents(docs, embedding)
+vectorstore.save_local("faq_index")
+
+vectorstore = FAISS.load_local("faq_index", embedding, allow_dangerous_deserialization=True)
 
 def chat_with_faq(question: str):
-    faq_text = load_faq()
+    docs = vectorstore.similarity_search(question, k=2)
+    context = "\n\n".join(doc.page_content for doc in docs)
+    print("\nContext from FAQ snippets:\n", context)
+    system_message = {
+        "role": "system",
+        "content": f"You are a helpful AI assistant created by the platform engineering team. Use the following FAQ snippets to help answer user questions:\n\n{context}"
+    }
+    
     messages = [
-        create_system_message(faq_text),
+        system_message,
         {"role": "user", "content": question}
     ]
-    
+
     completion = client.chat.completions.create(
         model=deployment,
         messages=messages,

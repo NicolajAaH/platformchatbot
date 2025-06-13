@@ -6,7 +6,7 @@ def chat_interface(message, history):
     response = chat_with_faq(message)
     return response
 
-port = int(os.environ.get("PORT", 80))
+port = int(os.environ.get("PORT", 5057))
 
 
 gr.ChatInterface(fn=chat_interface, type="messages").launch(server_name="0.0.0.0", server_port=port)
