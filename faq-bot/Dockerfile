@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose port (Gradio defaults to 7860)
-EXPOSE 7860
+EXPOSE 80
 
 # Run the app
 CMD ["python", "app.py"]
