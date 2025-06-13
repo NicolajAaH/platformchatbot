@@ -27,7 +27,7 @@ def load_faq(filename="faq.txt"):
 def create_system_message(faq_text):
     return {
         "role": "system",
-        "content": f"You are a helpful AI assistant. Use the following FAQ to answer user questions:\n{faq_text}"
+        "content": f"You are a helpful AI assistant created by the platform engineering team to support developers. Use the following FAQ content to answer their questions clearly and concisely, helping them solve common issues before contacting the platform team directly.:\n{faq_text}"
     }
 
 def chat_with_faq(question: str):
