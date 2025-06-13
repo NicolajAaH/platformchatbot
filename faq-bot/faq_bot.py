@@ -4,8 +4,9 @@ from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from langchain_community.vectorstores import FAISS
 from langchain_openai.embeddings import AzureOpenAIEmbeddings
 from langchain.schema import Document
+import json
+from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-
       
 endpoint = os.getenv("ENDPOINT_URL")
 deployment = os.getenv("DEPLOYMENT_NAME")
@@ -30,16 +31,16 @@ embedding = AzureOpenAIEmbeddings(
     openai_api_version="2024-12-01-preview",
 )
 
-# Load and split the FAQ
-with open("faq.txt", "r", encoding="utf-8") as f:
-    faq_text = f.read()
+# Load the structured FAQ JSON
+with open("faq.json", "r", encoding="utf-8") as f:
+    faq_data = json.load(f)
+# Create documents from question + answer
+docs = []
+for item in faq_data:
+    content = f"Q: {item['question']}\nA: {item['answer']}"
+    docs.append(Document(page_content=content))
 
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-chunks = text_splitter.split_text(faq_text)
-
-docs = [Document(page_content=chunk) for chunk in chunks]
-
-# Create and save the FAISS index
+# Index with FAISS
 vectorstore = FAISS.from_documents(docs, embedding)
 vectorstore.save_local("faq_index")
 
@@ -51,7 +52,7 @@ def chat_with_faq(question: str):
     print("\nContext from FAQ snippets:\n", context)
     system_message = {
         "role": "system",
-        "content": f"You are a helpful AI assistant created by the platform engineering team. If you are very unsure about your answer, then refer to the platform team. Use the following FAQ snippets to help answer user questions:\n\n{context}"
+        "content": f"You are a helpful AI assistant created by the platform engineering team. If you are very unsure about your answer, then refer to the platform team. DO NOT tell the user to do any manual stuff using cli commands or in the azure portal that would require control plane contributor. Use the following FAQ snippets to help answer user questions:\n\n{context}"
     }
     
     messages = [

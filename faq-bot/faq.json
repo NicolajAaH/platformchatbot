@@ -1,0 +1,22 @@
+[
+    {
+        "question": "What if a Databricks backup fails?",
+        "answer": "Go to the Log Analytics workspace and check DatabricksBackup_CL."
+    },
+    {
+        "question": "What does a 403 Forbidden with 'Blocked' mean?",
+        "answer": "If a 403 Forbidden as status code is received, and the response body is “Blocked”, it means the WAF is blocking the request. Logs are enabled and stored in the shared log analytics workspace, which means all logs are stored and are searchable in the category FrontDoorWebApplicationFirewallLog."
+    },
+    {
+        "question": "I am missing access to a resource, what should I do?",
+        "answer": "If you don't have access to a resource, ensure you have Privileged Identity Management (PIM). PIM is required on 001 environments. If you still don't have access even with PIM, then ensure you logged out and in. All role assignments to Azure are given through the PIM groups. A person can never directly get assigned a role. They should always request PIM. "
+    },
+    {
+        "question": "Why can't I flip feature flags in Azure App Configuration?",
+        "answer": "If you get insufficient permissions when enabling/disabling a feature toggle, even though you have PIM to the specific environment, you might have accessed the feature manager without PIM. There are some problems with the way token is handled in Azure app configuration for example. When you go the App Configuration instance, it is only on controlplane, and when you access the feature manager, it is on data plane. When accessing feature manager Azure gets an access token for dataplane. This token has a lifetime of 60-85 minutes even if you sign out and gets PIM with higher privileges. There is no way to invalidate this token as by design from Azure. Therefore, there is nothing that can be done other than waiting for 60-85 minutes or getting another person, who has not accessed the feature manager without PIM first within the last 60-85 minutes, to flip the toggle. "
+    },
+    {
+        "question": "What does 'Login failed for user <token-identified principal>' mean?",
+        "answer": "This error is seen in various scenarios, such as when attempts are made to rename function apps. The background and solution are well-described in the article linked below. Please refer to the 'Solution' section at the bottom of the article for more details."
+    }
+]
