@@ -1,0 +1,3 @@
+If a databricks backup fails, then go to the log analytics workspace and under logs get the rows from the table DatabricksBackup_CL.
+
+If a 403 Forbidden as status code is received, and the response body is “Blocked”, it means the WAF is blocking the request. 
