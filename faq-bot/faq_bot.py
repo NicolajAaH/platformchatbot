@@ -51,7 +51,7 @@ def chat_with_faq(question: str):
     print("\nContext from FAQ snippets:\n", context)
     system_message = {
         "role": "system",
-        "content": f"You are a helpful AI assistant created by the platform engineering team. Use the following FAQ snippets to help answer user questions:\n\n{context}"
+        "content": f"You are a helpful AI assistant created by the platform engineering team. If you are very unsure about your answer, then refer to the platform team. Use the following FAQ snippets to help answer user questions:\n\n{context}"
     }
     
     messages = [
